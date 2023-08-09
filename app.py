@@ -1,6 +1,9 @@
 from flask import Flask, render_template, request, url_for
 from flask_socketio import SocketIO, emit
 from flask_ngrok import run_with_ngrok
+from PIL import Image
+import cv2
+import numpy as np
 import os
 import re
 import shutil
@@ -14,7 +17,7 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
 socketio = SocketIO(app)
 
-@app.get('/')
+@app.route('/')
 def index():
     return render_template('index.html')
 
@@ -53,19 +56,25 @@ def upload_file():
 @socketio.on('redraw')
 def redraw():
     if only_dir():
+        socketio.emit('log', {'message': 'redraw dir'})
         t = threading.Thread(target=activate_redraw_dir)
     else:
+        socketio.emit('log', {'message': 'redraw files'})
         t = threading.Thread(target=activate_redraw_files)
 
     t.start()
 
 def activate_redraw_dir():
-    os.makedirs('static/public/result')
-    path = 'static/public'
+    directory = os.path.abspath('static/public/result') 
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    path = os.path.abspath('static/public') 
 
     for item in os.listdir(path):
         current_path = os.path.join(path, item)
-        process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {current_path} --output_path {current_path}'.split(), stdout=subprocess.PIPE)
+        output_path = os.path.join(directory, item)
+        process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {current_path} --output_path {output_path}'.split(), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline().decode()
             if output == '' and process.poll() is not None:
@@ -76,8 +85,12 @@ def activate_redraw_dir():
 
 
 def activate_redraw_files():
-    os.makedirs('static/public/result')
-    process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory static/public --output_path static/public/result'.split(), stdout=subprocess.PIPE)
+    directory = os.path.abspath('static/public/result') 
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+
+    path = os.path.abspath('static/public') 
+    process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline().decode()
         if output == '' and process.poll() is not None:
@@ -117,7 +130,7 @@ def panel_cleaner_dir():
     path = 'static/public'
 
     for item in os.listdir(path):
-        current_path = os.path.join(path, item)
+        current_path = os.path.abspath(os.path.join(path, item))
         process = subprocess.Popen(f'pcleaner clean {current_path} -m --output_dir={current_path}'.split(), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline().decode()
@@ -126,10 +139,12 @@ def panel_cleaner_dir():
             if output != '':
                 socketio.emit('log', {'message': output})
 
+    transform_images_recursively('static/public')                
     socketio.emit('panel_cleaner', {'finished': True, 'files': get_files('folders')})
 
 def panel_cleaner_files():
-    process = subprocess.Popen('pcleaner clean static/public -m --output_dir=static/public'.split(), stdout=subprocess.PIPE)
+    path = os.path.abspath('static/public')
+    process = subprocess.Popen(f'pcleaner clean {path} -m --output_dir={path}'.split(), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline().decode()
         if output == '' and process.poll() is not None:
@@ -137,6 +152,7 @@ def panel_cleaner_files():
         if output != '':
             socketio.emit('log', {'message': output})
 
+    transform_images_recursively('static/public')
     socketio.emit('panel_cleaner', {'finished': True, 'files': get_files('files')})
 
 def delete_folder_contents(folder_path):
@@ -149,6 +165,20 @@ def delete_folder_contents(folder_path):
                 shutil.rmtree(file_path)
         except Exception as e:
             print(f"Failed to delete {file_path}. Reason: {e}")
+
+def transform_image(path):
+    im = cv2.imread(path, -1)
+    im[np.where(im[:, :, 3] == 0)] = (0, 0, 0, 255)
+    cv2.imwrite(path, im)
+
+def transform_images_recursively(path):
+    for filename in os.listdir(path):
+        full_path = os.path.join(path, filename)
+
+        if os.path.isfile(full_path) and filename.lower().endswith("_mask.png"):
+            transform_image(full_path)
+        elif os.path.isdir(full_path):
+            transform_images_recursively(full_path)
 
 if __name__ == '__main__':
     socketio.run(app)

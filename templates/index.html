@@ -6,63 +6,70 @@
   <title>Redrawer</title>
   <script src="{{url_for('static', filename='javascripts/socket.io.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/fabric.min.js')}}"></script>
-  <style type="text/css">
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-    }
-    #log {
-      margin: 0 auto;
-      width: 96%;
-      height: 200px;
-      border: 1px solid black;
-      overflow-y: scroll;
-      padding: 10px;
-    }
-    #log p {
-      margin: 0;
-      padding: 0;
-      font-family: monospace;
-      font-size: 14px;
-    }
-  </style>
+  <link href="{{url_for('static', filename='stylesheets/application.css')}}" rel="stylesheet">
 </head>
-<body>
-  <form id="form" action="/upload" method="post" enctype="multipart/form-data">
-    <input type="file" name="file">
-    <input type="submit" value="Send">
-  </form>
-  <div>
-    <input type="range" id="opacity" name="opacity" min="0" max="1" step="0.1" value="1" />
-    <label for="opacity">Opacity</label>
-  </div>
-  <div>
-    <input type="range" id="pincel" name="pincel" min="5" max="50" step="1" value="10" />
-    <label for="pincel">Pincel Size</label>
-    <input type="color" id="color" name="color"/>
-    <label for="color">Pincel Color</label>
-  </div>
-  <div>
-    <input type="button" name="undo" id="undo" value="Undo">
-    <label for="undo">Undo</label>
-  </div>
-  <div>
-    <input type="button" name="save" id="save" value="Save">
-    <label for="save">Save</label>
-  </div>
-  <div>
-    <input type="button" name="send" id="send" value="Send">
-    <label for="send">Send to AI</label>
-  </div>
-  <div>
-    <input type="button" name="back" id="back" value="back">
-    <input type="button" name="next" id="next" value="next">
+<body class="h-screen p-2 bg-gray-200">
+  <div id="alerts" class="flex flex-col gap-1 absolute right-2 top-2"></div>
+  <div class="bg-white rounded p-2">
+    <form id="form" action="/upload" method="post" enctype="multipart/form-data" class="flex gap-3 mb-2 items-center">
+      <label class="text-sm font-medium text-gray-900" for="file_input">Upload Zip</label>
+      <input class="w-96 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" id="file" type="file">
+      <input type="submit" value="Send" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-0.5 cursor-pointer">
+    </form>
+    <div class="flex justify-between mb-3 items-center">
+      <div class="flex gap-2">
+        <div>
+          <label for="opacity" class="block mb-2 text-sm font-medium text-gray-900">Opacity</label>
+          <input id="opacity" type="range" min="0" max="1" step="0.1" value="1" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label for="pincel" class="block mb-2 text-sm font-medium text-gray-900">Pincel Size</label>
+          <input id="pincel" type="range" min="5" max="80" step="1" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+        </div>
+        <div>
+          <label for="color" class="block mb-2 text-sm font-medium text-gray-900">Pincel Color</label>
+          <input type="color" id="color" name="color" class="w-full" />
+        </div>
+      </div>
+      <div class="flex gap-2">
+        <div>
+          <button id="undo" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-3 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5">
+              <path fill-rule="evenodd" d="M9.53 2.47a.75.75 0 010 1.06L4.81 8.25H15a6.75 6.75 0 010 13.5h-3a.75.75 0 010-1.5h3a5.25 5.25 0 100-10.5H4.81l4.72 4.72a.75.75 0 11-1.06 1.06l-6-6a.75.75 0 010-1.06l6-6a.75.75 0 011.06 0z" clip-rule="evenodd" />
+            </svg>
+          </button>
+        </div>
+        <div>
+          <button id="save" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
+            Save Mask
+          </button>
+        </div>
+        <div>
+          <button id="send" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
+            Redraw
+          </button>
+        </div>
+        <div>
+          <button id="back" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          </button>
+          <button id="next" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          </button>
+        </div>  
+      </div>
+    </div>
+    <div class="flex justify-center mb-4">
+      <canvas id="canvas" width="620" height="450" class="bg-green-200"></canvas>
+    </div>
+    <div id="log" class="mx-auto w-full h-64 border border-black overflow-y-auto mb-2"></div>
   </div>
 
-  <canvas id="canvas"></canvas>
-  <div id="log"></div>
-
+  <script src="{{url_for('static', filename='javascripts/alert.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/log.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/canvas.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/socket.js')}}"></script>

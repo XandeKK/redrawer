@@ -6,6 +6,7 @@ class Canvas {
 		this.index = 0;
 		this.canvas.isDrawingMode = true;
 		this.canvas.freeDrawingBrush.width = 10;
+		this.opacity = 1;
 
 		this.add_event();
 	}
@@ -66,6 +67,7 @@ class Canvas {
 				left: 0,
 				top: 0,
 				selectable: false,
+				opacity: this.opacity,
 			});
 			this.mask = img;
 			this.canvas.add(img);
@@ -73,6 +75,7 @@ class Canvas {
 	}
 
 	set_opacity_mask(value) {
+		this.opacity = value;
 		this.canvas._objects.forEach(object=> {
 			object.set({
 				opacity: value,
@@ -97,6 +100,8 @@ class Canvas {
 	}
 
 	save() {
+		if (this.mask_url === null) return;
+		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
 		  var formData = new FormData();
 		  formData.append('file', blob, this.mask_url);
@@ -108,11 +113,8 @@ class Canvas {
 		});
 	}
 
-
-
 	next() {
-		console.log('next')
-		if (this.index == this.files.length - 1) {
+		if (this.files == null || this.index == this.files.length - 1) {
 			return null;
 		} else {
 			this.index++;
@@ -121,8 +123,7 @@ class Canvas {
 	}
 
 	back() {
-		console.log('back')
-		if (this.index == 0) {
+		if (this.files == null || this.index == 0) {
 			return null;
 		} else {
 			this.index--;

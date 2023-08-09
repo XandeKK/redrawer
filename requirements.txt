@@ -1,3 +1,4 @@
 flask
 flask_socketio
 flask_ngrok
+opencv_python

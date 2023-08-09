@@ -8,11 +8,11 @@ class Socket {
 
 	add_event() {
 		this.socket.on('connect', function() {
-			console.log("connected");
+			Alert.alert('Connected');
 		});
 
 		this.socket.on('message', (data)=> {
-			console.log(data);
+			Alert.alert(data.message);
 		});
 
 		this.socket.on('log', (data)=> {
@@ -51,6 +51,7 @@ class Socket {
 		});
 
 		document.getElementById('send').addEventListener('click', evt=> {
+			if (this.canvas.files == null) return;
 			this.socket.emit('redraw');
 		});
 	}
