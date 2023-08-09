@@ -35,7 +35,7 @@ def upload():
         os.remove(path_file)
         socketio.emit('message', {'message': 'unzipped'})
 
-    if request.form.get('waifu2x', False):
+    if request.form.get('waifu2x', False) == 'true':
         if only_dir():
             t = threading.Thread(target=waifu2x_dir)
         else:
