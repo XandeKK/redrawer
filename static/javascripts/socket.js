@@ -51,9 +51,9 @@ class Socket {
 			})
 		});
 
-		document.getElementById('send').addEventListener('click', evt=> {
+		document.getElementById('redraw_all').addEventListener('click', evt=> {
 			if (this.canvas.files == null) return;
-			this.socket.emit('redraw');
+			this.socket.emit('redraw_all');
 		});
 	}
 }

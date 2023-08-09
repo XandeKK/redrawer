@@ -5,10 +5,12 @@ class Canvas {
 		this.mask_url = null;
 		this.index = 0;
 		this.canvas.isDrawingMode = true;
+		this.canvas.freeDrawingCursor = 'none'
 		this.canvas.freeDrawingBrush.width = 10;
 		this.opacity = 0.5;
 
 		this.add_event();
+		this.create_cursor();
 	}
 
 	add_event() {
@@ -20,11 +22,11 @@ class Canvas {
 			this.undo();
 		});
 
-		document.getElementById('save').addEventListener('click', evt=> {
-			this.save();
+		document.getElementById('save_mask').addEventListener('click', evt=> {
+			this.save_mask();
 		});
 
-		document.getElementById('pincel').addEventListener('input', evt=> {
+		document.getElementById('pincel').addEventListener('change', evt=> {
 			this.set_brush_width(evt.target.value);
 		});
 
@@ -38,6 +40,75 @@ class Canvas {
 
 		document.getElementById('color').addEventListener('input', evt=> {
 			this.set_color(evt.target.value);
+		});
+
+		hotkeys('ctrl+z', (event, handler) => {
+			this.undo();
+			event.preventDefault();
+		});
+
+		hotkeys('ctrl+s', (event, handler) => {
+			Alert.alert('redraw one');
+			// this.redraw_one();
+			event.preventDefault();
+		});
+
+		hotkeys('ctrl+m', (event, handler) => {
+			Alert.alert('save mask');
+			this.save_mask();
+			event.preventDefault();
+		});
+
+		hotkeys('ctrl+alt+s', (event, handler) => {
+			Alert.alert('redraw all');
+			this.redraw_all();
+			event.preventDefault();
+		});
+
+		hotkeys('ctrl+left', (event, handler) => {
+			this.back();
+			event.preventDefault();
+		});
+
+		hotkeys('ctrl+right', (event, handler) => {
+			this.next();
+			event.preventDefault();
+		});
+	}
+
+	create_cursor() {
+		const cursor = new fabric.StaticCanvas("cursor");
+		this.cursorOpacity = .5;
+		this.mousecursor = new fabric.Circle({ 
+			left: -100, 
+			top: -100, 
+			radius: this.canvas.freeDrawingBrush.width / 2, 
+			fill: "rgba(255,0,0," + this.cursorOpacity + ")",
+			stroke: "black",
+			originX: 'center', 
+			originY: 'center'
+		});
+		cursor.add(this.mousecursor);
+
+		this.canvas.on('mouse:move', (evt) => {
+			const mouse = this.canvas.getPointer(evt.e);
+			this.mousecursor
+			.set({
+				top: mouse.y,
+				left: mouse.x
+			})
+			.setCoords()
+			.canvas.renderAll();
+		});
+
+		this.canvas.on('mouse:out', () => {
+			this.mousecursor
+			.set({
+				top: this.mousecursor.top,
+				left: this.mousecursor.left
+			})
+			.setCoords()
+			.canvas.renderAll();
 		});
 	}
 
@@ -85,21 +156,30 @@ class Canvas {
 	}
 
 	set_brush_width(value) {
-		this.canvas.freeDrawingBrush.width = parseInt(value);
+		const size = parseInt(value, 10);
+		this.canvas.freeDrawingBrush.width = size;
+		this.mousecursor
+		.set({
+			left: this.mousecursor.left,
+			top: this.mousecursor.top,
+			radius: size/2
+		})
+		.setCoords()
+		.canvas.renderAll();
 	}
 
 	set_color(value) {
-	    this.canvas.freeDrawingBrush.color = value;
+		this.canvas.freeDrawingBrush.color = value;
 	}
 
 	undo() {
-		if (this.canvas._objects.length > 1) {
+		if (this.canvas._objects.length >= 1 && this.canvas._objects[0].type === 'path') {
 			this.canvas._objects.pop();
 			this.canvas.renderAll();
 		}
 	}
 
-	save() {
+	save_mask() {
 		if (this.mask_url === null) return;
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
