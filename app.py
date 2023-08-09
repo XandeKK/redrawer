@@ -82,7 +82,7 @@ def activate_redraw_dir():
     for folder in os.listdir(path):
         current_path = os.path.join(path, folder)
         output_path = os.path.join(directory, folder)
-        socketio.emit('message', {'message': f'inpaint {current_path}'})
+        socketio.emit('message', {'message': f'redraw {current_path}'})
         process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {current_path} --output_path {output_path}'.split(), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline().decode()
@@ -138,7 +138,7 @@ def activate_redraw_files():
     os.makedirs(directory)
 
     path = os.path.abspath('static/public') 
-    socketio.emit('message', {'message': f'waifux2 {path}'})
+    socketio.emit('message', {'message': f'redraw {path}'})
     process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline().decode()

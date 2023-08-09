@@ -82,7 +82,6 @@ class Canvas {
 			});
 		});
 		this.canvas.renderAll();
-		document.getElementById('color').dispatchEvent(new CustomEvent('input'));
 	}
 
 	set_brush_width(value) {
@@ -90,12 +89,7 @@ class Canvas {
 	}
 
 	set_color(value) {
-	    const brushColor = value.replace('#', '');
-	    const r = parseInt(brushColor.substring(0, 2), 16);
-	    const g = parseInt(brushColor.substring(2, 4), 16);
-	    const b = parseInt(brushColor.substring(4, 6), 16);
-	    const a = this.opacity;
-	    this.canvas.freeDrawingBrush.color = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
+	    this.canvas.freeDrawingBrush.color = value;
 	}
 
 	undo() {
