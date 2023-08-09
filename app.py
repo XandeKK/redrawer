@@ -51,10 +51,30 @@ def upload_file():
 
 @socketio.on('redraw')
 def redraw():
-    t = threading.Thread(target=activate_redraw)
+    if only_dir():
+        t = threading.Thread(target=activate_redraw_dir)
+    else:
+        t = threading.Thread(target=activate_redraw_files)
+
     t.start()
 
-def activate_redraw():
+def activate_redraw_dir():
+    os.makedirs('static/public/result')
+    path = 'static/public'
+
+    for item in os.listdir(path):
+        current_path = os.path.join(path, item)
+        process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {current_path} --output_path {current_path}'.split(), stdout=subprocess.PIPE)
+        while True:
+            output = process.stdout.readline().decode()
+            if output == '' and process.poll() is not None:
+                break
+            socketio.emit('log', {'message': output})
+    shutil.make_archive("static/public/result", "zip", "static/public/result")
+    socketio.emit('ai', {'message': 'finished'})
+
+
+def activate_redraw_files():
     os.makedirs('static/public/result')
     process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory static/public --output_path static/public/result'.split(), stdout=subprocess.PIPE)
     while True:

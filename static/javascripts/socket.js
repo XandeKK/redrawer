@@ -16,7 +16,7 @@ class Socket {
 		});
 
 		this.socket.on('log', (data)=> {
-			console.log(data);
+			window.log.add(data.message);
 		});
 
 		this.socket.on('ai', (data)=> {

@@ -12,7 +12,20 @@
       margin: 0;
       padding: 0;
     }
-
+    #log {
+      margin: 0 auto;
+      width: 96%;
+      height: 200px;
+      border: 1px solid black;
+      overflow-y: scroll;
+      padding: 10px;
+    }
+    #log p {
+      margin: 0;
+      padding: 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
   </style>
 </head>
 <body>
@@ -48,6 +61,9 @@
   </div>
 
   <canvas id="canvas"></canvas>
+  <div id="log"></div>
+
+  <script src="{{url_for('static', filename='javascripts/log.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/canvas.js')}}"></script>
   <script src="{{url_for('static', filename='javascripts/socket.js')}}"></script>
 </body>
