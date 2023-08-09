@@ -35,11 +35,17 @@ def upload():
         os.remove(path_file)
         socketio.emit('message', {'message': 'unzipped'})
 
-    if only_dir():
-        t = threading.Thread(target=panel_cleaner_dir)
+    if request.form.get('waifu2x', False):
+        if only_dir():
+            t = threading.Thread(target=waifu2x_dir)
+        else:
+            t = threading.Thread(target=waifu2x_files)
     else:
-        t = threading.Thread(target=panel_cleaner_files)
-    
+        if only_dir():
+            t = threading.Thread(target=panel_cleaner_dir)
+        else:
+            t = threading.Thread(target=panel_cleaner_files)
+
     t.start()
 
     return 'File saved!', 200
@@ -66,14 +72,17 @@ def redraw():
 
 def activate_redraw_dir():
     directory = os.path.abspath('static/public/result') 
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if os.path.exists(directory):
+        delete_folder_contents('static/public/result')
+        os.rmdir('static/public/result')
+    os.makedirs(directory)
 
     path = os.path.abspath('static/public') 
 
-    for item in os.listdir(path):
-        current_path = os.path.join(path, item)
-        output_path = os.path.join(directory, item)
+    for folder in os.listdir(path):
+        current_path = os.path.join(path, folder)
+        output_path = os.path.join(directory, folder)
+        socketio.emit('message', {'message': f'inpaint {current_path}'})
         process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {current_path} --output_path {output_path}'.split(), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline().decode()
@@ -83,13 +92,53 @@ def activate_redraw_dir():
     shutil.make_archive("static/public/result", "zip", "static/public/result")
     socketio.emit('ai', {'message': 'finished'})
 
+def waifu2x_dir():
+    path = os.path.abspath('static/public') 
+
+    for folder in os.listdir(path):
+        current_path = os.path.join(path, folder)
+        socketio.emit('message', {'message': f'waifux2 {current_path}'})
+        process = subprocess.Popen(f'python -m waifu2x.cli -i {current_path} --output_path {os.path.join(current_path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
+        while True:
+            output = process.stdout.readline().decode()
+            if output == '' and process.poll() is not None:
+                break
+            socketio.emit('log', {'message': output})
+
+        for file in glob.glob(os.path.join(current_path, 'cleaned', '*.png')):
+            os.replace(file, os.path.join(current_path, file.split('/')[-1]))
+
+    t = threading.Thread(target=panel_cleaner_dir)
+
+    t.start()
+
+def waifu2x_files():
+    path = os.path.abspath('static/public')
+    socketio.emit('message', {'message': f'waifux2 {path}'}) 
+
+    process = subprocess.Popen(f'python -m waifu2x.cli -i {path} --output_path {os.path.join(path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
+    while True:
+        output = process.stdout.readline().decode()
+        if output == '' and process.poll() is not None:
+            break
+        socketio.emit('log', {'message': output})
+
+    for file in glob.glob(os.path.join(path, 'cleaned', '*.png')):
+        os.replace(file, os.path.join(path, file.split('/')[-1]))
+
+    t = threading.Thread(target=panel_cleaner_dir)
+
+    t.start()
 
 def activate_redraw_files():
     directory = os.path.abspath('static/public/result') 
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+    if os.path.exists(directory):
+        delete_folder_contents('static/public/result')
+        os.rmdir('static/public/result')
+    os.makedirs(directory)
 
     path = os.path.abspath('static/public') 
+    socketio.emit('message', {'message': f'waifux2 {path}'})
     process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline().decode()
@@ -129,8 +178,9 @@ def get_files(type):
 def panel_cleaner_dir():
     path = 'static/public'
 
-    for item in os.listdir(path):
-        current_path = os.path.abspath(os.path.join(path, item))
+    for folder in os.listdir(path):
+        current_path = os.path.abspath(os.path.join(path, folder))
+        socketio.emit('message', {'message': f'panelcleaner {current_path}'})
         process = subprocess.Popen(f'pcleaner clean {current_path} -m --output_dir={current_path}'.split(), stdout=subprocess.PIPE)
         while True:
             output = process.stdout.readline().decode()
@@ -144,6 +194,7 @@ def panel_cleaner_dir():
 
 def panel_cleaner_files():
     path = os.path.abspath('static/public')
+    socketio.emit('message', {'message': f'panelcleaner {path}'})
     process = subprocess.Popen(f'pcleaner clean {path} -m --output_dir={path}'.split(), stdout=subprocess.PIPE)
     while True:
         output = process.stdout.readline().decode()

@@ -6,7 +6,7 @@ class Canvas {
 		this.index = 0;
 		this.canvas.isDrawingMode = true;
 		this.canvas.freeDrawingBrush.width = 10;
-		this.opacity = 1;
+		this.opacity = 0.5;
 
 		this.add_event();
 	}
@@ -82,6 +82,7 @@ class Canvas {
 			});
 		});
 		this.canvas.renderAll();
+		document.getElementById('color').dispatchEvent(new CustomEvent('input'));
 	}
 
 	set_brush_width(value) {
@@ -89,7 +90,12 @@ class Canvas {
 	}
 
 	set_color(value) {
-		this.canvas.freeDrawingBrush.color = value;
+	    const brushColor = value.replace('#', '');
+	    const r = parseInt(brushColor.substring(0, 2), 16);
+	    const g = parseInt(brushColor.substring(2, 4), 16);
+	    const b = parseInt(brushColor.substring(4, 6), 16);
+	    const a = this.opacity;
+	    this.canvas.freeDrawingBrush.color = 'rgba(' + r + ', ' + g + ', ' + b + ', ' + a + ')';
 	}
 
 	undo() {
@@ -103,13 +109,14 @@ class Canvas {
 		if (this.mask_url === null) return;
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
-		  var formData = new FormData();
-		  formData.append('file', blob, this.mask_url);
+			var formData = new FormData();
+			formData.append('file', blob, this.mask_url);
 
-		  fetch('/upload_file', {
-		    method: 'POST',
-		    body: formData
-		  });
+			fetch('/upload_file', {
+				method: 'POST',
+				body: formData
+			});
+			this.set_opacity_mask(0.5);
 		});
 	}
 
