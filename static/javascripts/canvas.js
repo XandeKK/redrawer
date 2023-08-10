@@ -47,21 +47,9 @@ class Canvas {
 			event.preventDefault();
 		});
 
-		hotkeys('ctrl+s', (event, handler) => {
-			Alert.alert('redraw one');
-			// this.redraw_one();
-			event.preventDefault();
-		});
-
 		hotkeys('ctrl+m', (event, handler) => {
 			Alert.alert('save mask');
 			this.save_mask();
-			event.preventDefault();
-		});
-
-		hotkeys('ctrl+alt+s', (event, handler) => {
-			Alert.alert('redraw all');
-			this.redraw_all();
 			event.preventDefault();
 		});
 
