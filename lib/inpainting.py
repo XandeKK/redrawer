@@ -27,17 +27,21 @@ class Inpainting:
 		t.start()
 
 	def redraw_one_file(self, file, output_path):
-		directory = os.path.abspath(output_path)
+		directory = os.path.abspath(os.path.join(output_path, 'one_file'))
 		path = os.path.abspath(file)
+
 		self.socketio.emit('message', {'message': f'redraw {file}'})
+
 		process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_path {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
 		while True:
 			output = process.stdout.readline().decode()
 			if output == '' and process.poll() is not None:
 				break
 			self.socketio.emit('log', {'message': output})
-		shutil.make_archive("static/public/result", "zip", "static/public/result")
-		self.socketio.emit('inpainting', {'message': 'finished'})
+		
+		abspath = os.path.abspath('')
+		file = os.path.join(directory.replace(abspath + '/', ''), os.path.basename(file))
+		self.socketio.emit('inpainting_one_file', {'message': 'finished', 'file': file})
 
 	def redraw_all_dir(self):
 		directory = os.path.abspath('static/public/result') 

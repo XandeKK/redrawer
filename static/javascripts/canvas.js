@@ -65,7 +65,7 @@ class Canvas {
 	}
 
 	create_cursor() {
-		const cursor = new fabric.StaticCanvas("cursor");
+		this.cursor = new fabric.StaticCanvas("cursor");
 		this.cursorOpacity = .5;
 		this.mousecursor = new fabric.Circle({ 
 			left: -100, 
@@ -76,7 +76,7 @@ class Canvas {
 			originX: 'center', 
 			originY: 'center'
 		});
-		cursor.add(this.mousecursor);
+		this.cursor.add(this.mousecursor);
 
 		this.canvas.on('mouse:move', (evt) => {
 			const mouse = this.canvas.getPointer(evt.e);
@@ -113,6 +113,10 @@ class Canvas {
 		this.mask_url = file_mask;
 
 		fabric.Image.fromURL(file, (img)=> {
+			this.cursor.setDimensions({
+				width: img.width,
+				height: img.height
+			});
 			this.canvas.setDimensions({
 				width: img.width,
 				height: img.height
@@ -161,7 +165,8 @@ class Canvas {
 	}
 
 	undo() {
-		if (this.canvas._objects.length >= 1 && this.canvas._objects[0].type === 'path') {
+		if (this.canvas._objects.length === 0) return;
+		if (this.canvas._objects[this.canvas._objects.length - 1].type === 'path') {
 			this.canvas._objects.pop();
 			this.canvas.renderAll();
 		}

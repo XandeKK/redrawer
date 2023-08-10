@@ -33,6 +33,20 @@ class Socket {
 			  });
 		});
 
+		this.socket.on('inpainting_one_file', (data)=> {
+			fetch(data.file)
+			  .then(response => response.blob())
+			  .then(blob => {
+			    const url = URL.createObjectURL(blob);
+			    const link = document.createElement('a');
+			    link.href = url;
+			    link.download = data.file.replace(/^.*\//, '');
+			    document.body.appendChild(link);
+			    link.click();
+			    document.body.removeChild(link);
+			  });
+		});
+
 		this.socket.on('panel_cleaner', (data)=> {
 			const files = data.files;
 			this.canvas.start(files);
@@ -73,7 +87,10 @@ class Socket {
 		hotkeys('ctrl+s', (event, handler) => {
 			if (this.canvas.mask_url == null) return;
 			Alert.alert('redraw one');
-			this.socket.emit('redraw_one', this.canvas.mask_url.replace('_mask', ''));
+			const image = this.canvas.mask_url.replace('_mask', '');
+			const mask_url_splited = this.canvas.mask_url.split('/');
+			const output = this.canvas.mask_url.replace(mask_url_splited[mask_url_splited.length - 1], '');
+			this.socket.emit('redraw_one', image, output);
 			event.preventDefault();
 		});
 	}
