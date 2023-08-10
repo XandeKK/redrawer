@@ -2,6 +2,7 @@ import subprocess
 import threading
 import os
 import cv2
+import numpy as np
 
 class PanelCleaner:
 	def process_dir(socketio):

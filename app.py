@@ -1,20 +1,14 @@
 from flask import Flask, render_template, request, url_for
 from flask_socketio import SocketIO, emit
 from flask_ngrok import run_with_ngrok
-from PIL import Image
 from lib.waifu2x import Waifu2x
 from lib.panel_cleaner import PanelCleaner
 from lib.inpainting import Inpainting
-import cv2
-import numpy as np
 import os
 import re
 import shutil
-import base64
 import zipfile
-import subprocess
 import threading
-import glob
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'secret!'
