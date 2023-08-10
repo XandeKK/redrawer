@@ -20,7 +20,7 @@ class Inpainting:
 		t.start()
 
 
-	def redraw_one(self, file, output):
+	def redraw_one(self, file):
 		self.socketio.emit('log', {'message': 'redraw_one'})
 		t = threading.Thread(target=self.redraw_one_file, args=(file,))
 
