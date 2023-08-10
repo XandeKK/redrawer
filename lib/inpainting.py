@@ -7,7 +7,7 @@ class Inpainting:
 	def __init__(self, socketio):
 		self.socketio = socketio
 		self.socketio.on_event('redraw_all', lambda: self.redraw_all())
-		self.socketio.on_event('redraw_one', lambda file, output: self.redraw_one(file, output))
+		self.socketio.on_event('redraw_one', lambda file: self.redraw_one(file))
 
 	def redraw_all(self):
 		if only_dir():
@@ -22,12 +22,12 @@ class Inpainting:
 
 	def redraw_one(self, file, output):
 		self.socketio.emit('log', {'message': 'redraw_one'})
-		t = threading.Thread(target=self.redraw_one_file, args=(file, output,))
+		t = threading.Thread(target=self.redraw_one_file, args=(file,))
 
 		t.start()
 
-	def redraw_one_file(self, file, output_path):
-		directory = os.path.abspath(os.path.join(output_path, 'one_file'))
+	def redraw_one_file(self, file):
+		directory = os.path.abspath('static/one_file')
 		path = os.path.abspath(file)
 
 		self.socketio.emit('message', {'message': f'redraw {file}'})
@@ -38,9 +38,9 @@ class Inpainting:
 			if output == '' and process.poll() is not None:
 				break
 			self.socketio.emit('log', {'message': output})
-		
+
 		abspath = os.path.abspath('')
-		file = os.path.join(directory.replace(abspath + '/', ''), os.path.basename(file))
+		file = os.path.join('static/one_file', os.path.basename(file))
 		self.socketio.emit('inpainting_one_file', {'message': 'finished', 'file': file})
 
 	def redraw_all_dir(self):

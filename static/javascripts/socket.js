@@ -73,8 +73,7 @@ class Socket {
 			if (this.canvas.mask_url == null) return;
 			const image = this.canvas.mask_url.replace('_mask', '');
 			const mask_url_splited = this.canvas.mask_url.split('/');
-			const output = this.canvas.mask_url.replace(mask_url_splited[mask_url_splited.length - 1], '');
-			this.socket.emit('redraw_one', image, output);
+			this.socket.emit('redraw_one', image);
 		});
 
 		hotkeys('ctrl+alt+s', (event, handler) => {
