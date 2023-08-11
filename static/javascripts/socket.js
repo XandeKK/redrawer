@@ -34,7 +34,7 @@ class Socket {
 		});
 
 		this.socket.on('inpainting_one_file', (data)=> {
-			fetch(data.file)
+			fetch(data.file + '?cache=' + Math.random())
 			  .then(response => response.blob())
 			  .then(blob => {
 			    const url = URL.createObjectURL(blob);
