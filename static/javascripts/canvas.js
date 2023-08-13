@@ -103,6 +103,7 @@ class Canvas {
 	start(files) {
 		document.getElementById('form').remove();
 		this.files = files.flat();
+		document.getElementById('max_index').value = this.files.length;
 		this.set_image();
 	}
 
@@ -203,6 +204,10 @@ class Canvas {
 		});
 	}
 
+	set_view_index() {
+		document.getElementById('current_index').value = this.index;
+	}
+
 	next() {
 		if (this.files == null || this.index == this.files.length - 1) {
 			return null;
@@ -210,6 +215,7 @@ class Canvas {
 			this.index++;
 			this.set_image();
 		}
+		this.set_view_index();
 	}
 
 	back() {
@@ -219,5 +225,6 @@ class Canvas {
 			this.index--;
 			this.set_image(this.files[this.index]);
 		}
+		this.set_view_index();
 	}
 }
