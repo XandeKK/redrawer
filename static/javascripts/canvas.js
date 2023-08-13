@@ -103,7 +103,7 @@ class Canvas {
 	start(files) {
 		document.getElementById('form').remove();
 		this.files = files.flat();
-		document.getElementById('max_index').value = this.files.length;
+		document.getElementById('max_index').textContent = this.files.length;
 		this.set_image();
 	}
 
@@ -205,7 +205,7 @@ class Canvas {
 	}
 
 	set_view_index() {
-		document.getElementById('current_index').value = this.index;
+		document.getElementById('current_index').textContent = this.index;
 	}
 
 	next() {
