@@ -54,7 +54,7 @@ def upload_file():
     file.save(filename)
     socketio.emit('message', {'message': 'saved'})
 
-    return send_from_directory(filename)
+    return "okay", 200
 
 def only_dir():
     path = 'static/public'

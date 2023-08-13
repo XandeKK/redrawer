@@ -10,8 +10,8 @@ class Waifu2x:
 
 		for folder in os.listdir(path):
 			current_path = os.path.join(path, folder)
-			socketio.emit('message', {'message': f'waifux2 {current_path}'})
-			process = subprocess.Popen(f'python -m waifu2x.cli -i {current_path} --output_path {os.path.join(current_path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
+			socketio.emit('log', {'message': f'waifux2 {current_path}'})
+			process = subprocess.Popen(f'python -m waifu2x.cli -i {current_path} --output {os.path.join(current_path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
 			while True:
 				output = process.stdout.readline().decode()
 				if output == '' and process.poll() is not None:
@@ -26,9 +26,8 @@ class Waifu2x:
 
 	def process_files(socketio):
 		path = os.path.abspath('static/public')
-		socketio.emit('message', {'message': f'waifux2 {path}'}) 
-
-		process = subprocess.Popen(f'python -m waifu2x.cli -i {path} --output_path {os.path.join(path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
+		socketio.emit('log', {'message': f'waifux2 {path}'}) 
+		process = subprocess.Popen(f'python -m waifu2x.cli -i {path} --output {os.path.join(path, "cleaned")}'.split(), stdout=subprocess.PIPE, cwd="/content/nunif")
 		while True:
 			output = process.stdout.readline().decode()
 			if output == '' and process.poll() is not None:

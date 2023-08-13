@@ -173,12 +173,11 @@ class Canvas {
 	}
 
 	save_mask() {
-		// if (this.mask_url === null) return;
+		if (this.mask_url === null) return;
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
 			var formData = new FormData();
-			formData.append('file', blob, 'static/public/test.png');
-			// formData.append('file', blob, this.mask_url);
+			formData.append('file', blob, this.mask_url);
 
 			fetch('/upload_file', {
 				method: 'POST',
