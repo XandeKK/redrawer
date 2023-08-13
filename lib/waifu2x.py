@@ -2,6 +2,7 @@ import subprocess
 import threading
 import os
 from lib.panel_cleaner import PanelCleaner
+import glob
 
 class Waifu2x:
 	def process_dir(socketio):

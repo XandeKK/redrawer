@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for
+from flask import Flask, render_template, request, url_for, send_from_directory
 from flask_socketio import SocketIO, emit
 from flask_ngrok import run_with_ngrok
 from lib.waifu2x import Waifu2x
@@ -54,7 +54,7 @@ def upload_file():
     file.save(filename)
     socketio.emit('message', {'message': 'saved'})
 
-    return 'File saved!', 200
+    return send_from_directory(filename)
 
 def only_dir():
     path = 'static/public'

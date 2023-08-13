@@ -173,17 +173,34 @@ class Canvas {
 	}
 
 	save_mask() {
-		if (this.mask_url === null) return;
+		// if (this.mask_url === null) return;
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
 			var formData = new FormData();
-			formData.append('file', blob, this.mask_url);
+			formData.append('file', blob, 'static/public/test.png');
+			// formData.append('file', blob, this.mask_url);
 
 			fetch('/upload_file', {
 				method: 'POST',
 				body: formData
-			});
+			})
+			.then(() => {this.set_mask();})
 			this.set_opacity_mask(0.5);
+		});
+	}
+
+	set_mask() {
+		this.canvas._objects = [this.canvas._objects[0]];
+
+		fabric.Image.fromURL(this.mask_url + '?cache=' + Math.random(), (img)=> {
+			img.set({
+				left: 0,
+				top: 0,
+				selectable: false,
+				opacity: this.opacity,
+			});
+			this.mask = img;
+			this.canvas.add(img);
 		});
 	}
 
