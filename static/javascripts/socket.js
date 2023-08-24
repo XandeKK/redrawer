@@ -58,6 +58,7 @@ class Socket {
 			const formData = new FormData();
 			formData.append('file', fileInput.files[0]);
 			formData.append('waifu2x', document.getElementById('waifu2x').checked);
+			formData.append('test', document.getElementById('test').checked);
 			fetch('/upload', {
 				method: 'POST',
 				body: formData

@@ -4,6 +4,7 @@ from flask_ngrok import run_with_ngrok
 from lib.waifu2x import Waifu2x
 from lib.panel_cleaner import PanelCleaner
 from lib.inpainting import Inpainting
+from lib.test import Test
 import os
 import re
 import shutil
@@ -31,6 +32,15 @@ def upload():
         zip_ref.extractall(os.path.join('static', 'public'))
         os.remove(path_file)
         socketio.emit('message', {'message': 'unzipped'})
+
+    if request.form.get('test', False) == 'true':
+        if only_dir():
+            t = threading.Thread(target=Test.process_dir, args=(socketio,))
+        else:
+            t = threading.Thread(target=Test.process_files, args=(socketio,))
+        t.start()
+        return 'File saved!', 200
+
 
     if request.form.get('waifu2x', False) == 'true':
         if only_dir():

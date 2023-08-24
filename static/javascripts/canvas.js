@@ -208,6 +208,16 @@ class Canvas {
 		document.getElementById('current_index').textContent = this.index;
 	}
 
+	scroll_to_top() {
+		setTimeout(()=> {
+			window.scrollTo({
+		        top: 0,
+		        left: 0,
+		        behavior: 'smooth',
+		    })
+		}, 500)
+	}
+
 	next() {
 		if (this.files == null || this.index == this.files.length - 1) {
 			return null;
@@ -216,6 +226,7 @@ class Canvas {
 			this.set_image();
 		}
 		this.set_view_index();
+		this.scroll_to_top();
 	}
 
 	back() {
@@ -226,5 +237,6 @@ class Canvas {
 			this.set_image(this.files[this.index]);
 		}
 		this.set_view_index();
+		this.scroll_to_top();
 	}
 }
