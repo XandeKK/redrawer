@@ -3,6 +3,7 @@ import threading
 import os
 from lib.panel_cleaner import PanelCleaner
 import glob
+import shutil
 
 class Waifu2x:
 	def process_dir(socketio):
@@ -37,6 +38,7 @@ class Waifu2x:
 		for file in glob.glob(os.path.join(path, 'cleaned', '*.png')):
 			os.replace(file, os.path.join(path, file.split('/')[-1]))
 
+		shutil.make_archive("static/public/upscaled", "zip", "static/public")
 		t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
 
 		t.start()
