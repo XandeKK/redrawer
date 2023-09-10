@@ -62,7 +62,7 @@ def get_file():
 @app.route('/upload_mask', methods=['POST'])
 def upload_mask():
 	file = request.files['file']
-	filename = os.join('panelcleaner', file.filename)
+	filename = os.path.join('panelcleaner', file.filename)
 	file.save(filename)
 	socketio.emit('message', {'message': 'mask saved'})
 

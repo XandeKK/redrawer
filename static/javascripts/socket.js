@@ -20,7 +20,7 @@ class Socket {
 		});
 
 		this.socket.on('inpainting', (data)=> {
-			fetch('static/public/result.zip')
+			fetch('file?path=result.zip')
 			  .then(response => response.blob())
 			  .then(blob => {
 			    const url = URL.createObjectURL(blob);

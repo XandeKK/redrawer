@@ -94,6 +94,7 @@ class Canvas {
 		this.canvas.clear();
 		const file = this.files[this.index];
 		const file_mask = file.split('.').slice(0, -1).join('.') + '_mask.' + file.split('.').pop();
+		this.file_mask = file_mask;
 
 		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file, (img)=> {
 			this.cursor.setDimensions({
@@ -108,7 +109,7 @@ class Canvas {
 			this.canvas.renderAll();
 		});
 
-		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + file_mask, (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + file_mask + '&cache=' + Math.random(), (img)=> {
 			img.set({
 				left: 0,
 				top: 0,
@@ -172,12 +173,12 @@ class Canvas {
 	}
 
 	set_mask() {
-		const backgroundImage = this.canvas.backgroundImage;
-		this.canvas.clear();
-		this.canvas.backgroundImage
-		this.canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas));
+		const backgroundImage = this.canvas.backgroundImage.getSrc();
+		this.canvas.getObjects().forEach((obj)=> {
+			this.canvas.remove(obj);
+		});
 
-		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + this.mask.src, (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + this.file_mask + '&cache=' + Math.random(), (img)=> {
 			img.set({
 				left: 0,
 				top: 0,
