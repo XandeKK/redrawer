@@ -34,7 +34,7 @@ class Socket {
 		});
 
 		this.socket.on('inpainting_one_file', (data)=> {
-			fetch(data.file + '?cache=' + Math.random())
+			fetch('file' + '?path=' + 'result/' + data.file)
 			  .then(response => response.blob())
 			  .then(blob => {
 			    const url = URL.createObjectURL(blob);
@@ -58,7 +58,6 @@ class Socket {
 			const formData = new FormData();
 			formData.append('file', fileInput.files[0]);
 			formData.append('waifu2x', document.getElementById('waifu2x').checked);
-			formData.append('test', document.getElementById('test').checked);
 			fetch('/upload', {
 				method: 'POST',
 				body: formData
@@ -72,23 +71,7 @@ class Socket {
 
 		document.getElementById('redraw_one').addEventListener('click', evt=> {
 			if (this.canvas.mask_url == null) return;
-			const image = this.canvas.mask_url.replace('_mask', '');
-			this.socket.emit('redraw_one', image);
-		});
-
-		hotkeys('ctrl+alt+s', (event, handler) => {
-			if (this.canvas.files == null) return;
-			Alert.alert('redraw all');
-			this.socket.emit('redraw_all');
-			event.preventDefault();
-		});
-
-		hotkeys('ctrl+s', (event, handler) => {
-			if (this.canvas.mask_url == null) return;
-			Alert.alert('redraw one');
-			const image = this.canvas.mask_url.replace('_mask', '');
-			this.socket.emit('redraw_one', image);
-			event.preventDefault();
+			this.socket.emit('redraw_one', this.canvas.backgroundImage.src);
 		});
 	}
 }

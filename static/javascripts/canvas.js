@@ -2,7 +2,6 @@ class Canvas {
 	constructor() {
 		this.canvas = new fabric.Canvas('canvas');
 		this.files = null;
-		this.mask_url = null;
 		this.index = 0;
 		this.canvas.isDrawingMode = true;
 		this.canvas.freeDrawingCursor = 'none'
@@ -46,22 +45,6 @@ class Canvas {
 			this.undo();
 			event.preventDefault();
 		});
-
-		hotkeys('ctrl+m', (event, handler) => {
-			Alert.alert('save mask');
-			this.save_mask();
-			event.preventDefault();
-		});
-
-		hotkeys('ctrl+left', (event, handler) => {
-			this.back();
-			event.preventDefault();
-		});
-
-		hotkeys('ctrl+right', (event, handler) => {
-			this.next();
-			event.preventDefault();
-		});
 	}
 
 	create_cursor() {
@@ -103,7 +86,7 @@ class Canvas {
 	start(files) {
 		document.getElementById('form').remove();
 		this.files = files.flat();
-		document.getElementById('max_index').textContent = this.files.length;
+		document.getElementById('max_index').textContent = this.files.length - 1;
 		this.set_image();
 	}
 
@@ -111,9 +94,8 @@ class Canvas {
 		this.canvas.clear();
 		const file = this.files[this.index];
 		const file_mask = file.split('.').slice(0, -1).join('.') + '_mask.' + file.split('.').pop();
-		this.mask_url = file_mask;
 
-		fabric.Image.fromURL(file, (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file, (img)=> {
 			this.cursor.setDimensions({
 				width: img.width,
 				height: img.height
@@ -126,7 +108,7 @@ class Canvas {
 			this.canvas.renderAll();
 		});
 
-		fabric.Image.fromURL(file_mask + '?cache=' + Math.random(), (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + file_mask, (img)=> {
 			img.set({
 				left: 0,
 				top: 0,
@@ -140,7 +122,7 @@ class Canvas {
 
 	set_opacity_mask(value) {
 		this.opacity = value;
-		this.canvas._objects.forEach(object=> {
+		this.canvas.getObjects.forEach(object=> {
 			object.set({
 				opacity: value,
 			});
@@ -166,21 +148,21 @@ class Canvas {
 	}
 
 	undo() {
-		if (this.canvas._objects.length === 0) return;
-		if (this.canvas._objects[this.canvas._objects.length - 1].type === 'path') {
-			this.canvas._objects.pop();
+		if (this.canvas.getObjects.length === 0) return;
+		if (this.canvas.getObjects[this.canvas.getObjects.length - 1].type === 'path') {
+			this.canvas.getObjects.pop();
 			this.canvas.renderAll();
 		}
 	}
 
 	save_mask() {
-		if (this.mask_url === null) return;
+		if (this.mask.src === null) return;
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
 			var formData = new FormData();
-			formData.append('file', blob, this.mask_url);
+			formData.append('file', blob, this.mask.src);
 
-			fetch('/upload_file', {
+			fetch('/upload_mask', {
 				method: 'POST',
 				body: formData
 			})
@@ -190,9 +172,12 @@ class Canvas {
 	}
 
 	set_mask() {
-		this.canvas._objects = [this.canvas._objects[0]];
+		const backgroundImage = this.canvas.backgroundImage;
+		this.canvas.clear();
+		this.canvas.backgroundImage
+		this.canvas.setBackgroundImage(backgroundImage, canvas.renderAll.bind(canvas));
 
-		fabric.Image.fromURL(this.mask_url + '?cache=' + Math.random(), (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + this.mask.src, (img)=> {
 			img.set({
 				left: 0,
 				top: 0,

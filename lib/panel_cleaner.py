@@ -6,27 +6,12 @@ import glob
 import re
 
 class PanelCleaner:
-	def process_dir(socketio):
-		path = 'static/public'
-
-		for folder in os.listdir(path):
-			current_path = os.path.abspath(os.path.join(path, folder))
-			socketio.emit('message', {'message': f'panelcleaner {current_path}'})
-			process = subprocess.Popen(f'pcleaner clean {current_path} -m --output_dir={current_path}'.split(), stdout=subprocess.PIPE)
-			while True:
-				output = process.stdout.readline().decode()
-				if output == '' and process.poll() is not None:
-					break
-				if output != '':
-					socketio.emit('log', {'message': output})
-
-		Image.transform_images_recursively('static/public')                
-		socketio.emit('panel_cleaner', {'finished': True, 'files': Image.get_files('folders')})
-
 	def process_files(socketio):
-		path = os.path.abspath('static/public')
-		socketio.emit('message', {'message': f'panelcleaner {path}'})
-		process = subprocess.Popen(f'pcleaner clean {path} -m --output_dir={path}'.split(), stdout=subprocess.PIPE)
+		input_path = os.path.abspath('unzip')
+
+		output_path = os.path.abspath('panelcleaner')
+		socketio.emit('message', {'message': f'panelcleaner {input_path}'})
+		process = subprocess.Popen(f'pcleaner clean {input_path} -m --output_dir={output_path}'.split(), stdout=subprocess.PIPE)
 		while True:
 			output = process.stdout.readline().decode()
 			if output == '' and process.poll() is not None:
@@ -34,7 +19,7 @@ class PanelCleaner:
 			if output != '':
 				socketio.emit('log', {'message': output})
 
-		Image.transform_images_recursively('static/public')
+		Image.transform_images_recursively('panelcleaner')
 		socketio.emit('panel_cleaner', {'finished': True, 'files': Image.get_files('files')})
 
 class Image:
@@ -53,21 +38,11 @@ class Image:
 				Image.transform_images_recursively(full_path)
 
 	def get_files(type):
-		files = glob.glob('static/public/**/*.png', recursive=True)
+		files = glob.glob('unzip/*.png')
 		files_tmp = []
 		for filename in files:
 			basename = os.path.basename(filename)
 			if re.match(r'^\d+\.png$', basename):
-				files_tmp.append(filename)
-		if type == 'folders':
-			folders = set();
-			for file in files:
-				folders.add(file.split('/')[2])
-
-			files_sorted = []
-			for folder in folders:
-				f = list(filter(lambda file: file.find(f'/{folder}/') != -1, files))
-				files_sorted.append(sorted(files_tmp, key=lambda x: (int(os.path.basename(x).split('.')[0]))))
-			return files_sorted
+				files_tmp.append(os.path.basename(filename))
 		
-		return sorted(files_tmp, key=lambda x: (int(os.path.basename(x).split('.')[0])))
+		return sorted(files_tmp, key=lambda x: (int(x.split('.')[0])))
