@@ -1,30 +1,24 @@
 class Log {
   constructor(id) {
     this.elem = document.getElementById(id);
-    this.count = 0;
   }
   add(str) {
+    if (str === '') return;
     var p = document.createElement("p");
-    p.id = 'p-' + this.count
     p.className = 'text-xs p-1'
-    p.innerHTML = str;
+    p.innerHTML = formatAnsiToTailwind(str);
     this.elem.appendChild(p);
     this.elem.scrollTop = this.elem.scrollHeight;
-
-    this.count++;
-    if (this.count >= 100) {
-      this.remove_all();
-      this.count = 0;
-    }
   }
 
-  remove_all() {
-    for (var i = 0; i <= 100; i++) {
-      const elem = document.getElementById('p-' + i);
-      if (elem) {
-        elem.remove();
-      }
-    }
+  formatAnsiToTailwind(text) {
+    text = text.replace(/\u001b\[1m/g, '<span class="font-bold">');
+    text = text.replace(/\u001b\[22m/g, '</span>');
+    text = text.replace(/\u001b\[4m/g, '<span class="underline">');
+    text = text.replace(/\u001b\[24m/g, '</span>');
+    text = text.replace(/\n/g, '<br>');
+
+    return text;
   }
 }
 

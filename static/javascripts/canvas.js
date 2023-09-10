@@ -37,8 +37,12 @@ class Canvas {
 			this.next();
 		});
 
-		document.getElementById('color').addEventListener('input', evt=> {
-			this.set_color(evt.target.value);
+		document.getElementById('black').addEventListener('input', evt=> {
+			this.set_color('#000000');
+		});
+
+		document.getElementById('white').addEventListener('input', evt=> {
+			this.set_color('#ffffff');
 		});
 
 		hotkeys('ctrl+z', (event, handler) => {
@@ -161,7 +165,7 @@ class Canvas {
 		this.set_opacity_mask(1);
 		this.canvas.getElement().toBlob(blob=> {
 			var formData = new FormData();
-			formData.append('file', blob, this.mask.src);
+			formData.append('file', blob, this.file_mask);
 
 			fetch('/upload_mask', {
 				method: 'POST',
