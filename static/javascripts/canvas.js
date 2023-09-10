@@ -122,7 +122,7 @@ class Canvas {
 
 	set_opacity_mask(value) {
 		this.opacity = value;
-		this.canvas.getObjects.forEach(object=> {
+		this.canvas.getObjects().forEach(object=> {
 			object.set({
 				opacity: value,
 			});
@@ -148,9 +148,9 @@ class Canvas {
 	}
 
 	undo() {
-		if (this.canvas.getObjects.length === 0) return;
-		if (this.canvas.getObjects[this.canvas.getObjects.length - 1].type === 'path') {
-			this.canvas.getObjects.pop();
+		if (this.canvas.getObjects().length === 0) return;
+		if (this.canvas.getObjects()[this.canvas.getObjects().length - 1].type === 'path') {
+			this.canvas.getObjects().pop();
 			this.canvas.renderAll();
 		}
 	}

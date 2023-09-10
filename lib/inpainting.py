@@ -41,11 +41,11 @@ class Inpainting:
 	def redraw_all_files(self):
 		directory = os.path.abspath('result') 
 		if os.path.exists(directory):
-			delete_folder_contents('result')
-			os.rmdir('result')
+			delete_folder_contents(directory)
+			os.rmdir(directory)
 		os.makedirs(directory)
 
-		path = os.path.abspath('static/public')
+		path = os.path.abspath('unzip')
 		self.socketio.emit('message', {'message': f'redraw {path}'})
 		process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
 		while True:
@@ -53,12 +53,16 @@ class Inpainting:
 			if output == '' and process.poll() is not None:
 				break
 			self.socketio.emit('log', {'message': output})
-		shutil.make_archive("static/public/result", "zip", "static/public/result")
+		shutil.make_archive("result", "zip", "result")
 		self.socketio.emit('inpainting', {'message': 'finished'})
 
-def only_dir():
-	path = 'static/public'
-	files = os.listdir(path)
-	if len(files) == 0:
-		return False
-	return os.path.isdir(os.path.join(path, files[0]))
+def delete_folder_contents(folder_path):
+	for filename in os.listdir(folder_path):
+		file_path = os.path.join(folder_path, filename)
+		try:
+			if os.path.isfile(file_path) or os.path.islink(file_path):
+				os.unlink(file_path)
+			elif os.path.isdir(file_path):
+				shutil.rmtree(file_path)
+		except Exception as e:
+			print(f"Failed to delete {file_path}. Reason: {e}")

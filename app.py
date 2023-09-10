@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, url_for, send_from_directory
+from flask import Flask, render_template, request, url_for, send_from_directory, send_file
 from flask_socketio import SocketIO, emit
 from lib.waifu2x import Waifu2x
 from lib.panel_cleaner import PanelCleaner
@@ -18,12 +18,13 @@ def index():
 
 @app.route('/upload', methods=['POST'])
 def upload():
-	delete_folder_contents('upload')
 	file = request.files['file']
 	filename = file.filename
 	path_file = os.path.join('upload', filename)
-	if not os.path.exists(path_file):
-		os.makedirs(path_file)
+	if not os.path.exists('upload'):
+		os.makedirs('upload')
+	else:
+		delete_folder_contents('upload')
 
 	file.save(path_file)
 	socketio.emit('message', {'message': 'uploaded'})
@@ -31,6 +32,8 @@ def upload():
 	with zipfile.ZipFile(path_file, 'r') as zip_ref:
 		if not os.path.exists('unzip'):
 			os.makedirs('unzip')
+		else:
+			delete_folder_contents('unzip')
 
 		zip_ref.extractall('unzip')
 		socketio.emit('message', {'message': 'unzipped'})
