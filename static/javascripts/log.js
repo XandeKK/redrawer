@@ -6,7 +6,7 @@ class Log {
     if (str === '') return;
     var p = document.createElement("p");
     p.className = 'text-xs p-1'
-    p.innerHTML = formatAnsiToTailwind(str);
+    p.innerHTML = this.formatAnsiToTailwind(str);
     this.elem.appendChild(p);
     this.elem.scrollTop = this.elem.scrollHeight;
   }
