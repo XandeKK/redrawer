@@ -7,6 +7,7 @@ class Canvas {
 		this.canvas.freeDrawingCursor = 'none'
 		this.canvas.freeDrawingBrush.width = 10;
 		this.opacity = 0.5;
+		this.cache_image = Math.random();
 
 		this.add_event();
 		this.create_cursor();
@@ -100,7 +101,7 @@ class Canvas {
 		const file_mask = file.split('.').slice(0, -1).join('.') + '_mask.' + file.split('.').pop();
 		this.file_mask = file_mask;
 
-		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file, (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file + '&cache=' + this.cache_image, (img)=> {
 			this.cursor.setDimensions({
 				width: img.width,
 				height: img.height
