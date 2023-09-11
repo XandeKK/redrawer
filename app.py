@@ -44,12 +44,12 @@ def upload():
 	resize_images('unzip')
 	# If possible rename all files in order
 
-	# if request.form.get('waifu2x', False) == 'true':
-	# 	t = threading.Thread(target=Waifu2x.process_files, args=(socketio,))
-	# else:
-	# 	t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
+	if request.form.get('waifu2x', False) == 'true':
+		t = threading.Thread(target=Waifu2x.process_files, args=(socketio,))
+	else:
+		t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
 
-	# t.start()
+	t.start()
 
 	return 'File saved!', 200
 
@@ -70,7 +70,6 @@ def upload_mask():
 	file = request.files['file']
 	filename = os.path.join('panelcleaner', file.filename)
 	file.save(filename)
-	socketio.emit('message', {'message': 'mask saved'})
 
 	return "okay", 200
 

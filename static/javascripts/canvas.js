@@ -8,6 +8,7 @@ class Canvas {
 		this.canvas.freeDrawingBrush.width = 10;
 		this.opacity = 0.5;
 		this.cache_image = Math.random();
+		this.can_move = true;
 
 		this.add_event();
 		this.create_cursor();
@@ -96,6 +97,7 @@ class Canvas {
 	}
 
 	set_image() {
+		this.can_move = false;
 		this.canvas.clear();
 		const file = this.files[this.index];
 		const file_mask = file.split('.').slice(0, -1).join('.') + '_mask.' + file.split('.').pop();
@@ -123,6 +125,7 @@ class Canvas {
 			});
 			this.mask = img;
 			this.canvas.add(img);
+			this.can_move = true;
 		});
 	}
 
@@ -168,6 +171,7 @@ class Canvas {
 			var formData = new FormData();
 			formData.append('file', blob, this.file_mask);
 
+			this.can_move = false;
 			fetch('/upload_mask', {
 				method: 'POST',
 				body: formData
@@ -190,6 +194,8 @@ class Canvas {
 			});
 			this.mask = img;
 			this.canvas.add(img);
+			this.can_move = true;
+			Alert.alert('Mask saved');
 		});
 	}
 
@@ -208,6 +214,7 @@ class Canvas {
 	}
 
 	next() {
+		if (!this.can_move) return;
 		if (this.files == null || this.index == this.files.length - 1) {
 			return null;
 		} else {
@@ -219,6 +226,7 @@ class Canvas {
 	}
 
 	back() {
+		if (!this.can_move) return;
 		if (this.files == null || this.index == 0) {
 			return null;
 		} else {

@@ -21,6 +21,7 @@ class Log {
       '35': 'text-purple-600',
       '36': 'text-teal-600',
       '37': 'text-gray-300',
+      '39': 'text-black',
     };
 
     for (const code in colorMap) {
