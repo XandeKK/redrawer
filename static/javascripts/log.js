@@ -12,6 +12,23 @@ class Log {
   }
 
   formatAnsiToTailwind(text) {
+    const colorMap = {
+      '30': 'text-black',
+      '31': 'text-red-600',
+      '32': 'text-green-600',
+      '33': 'text-yellow-600',
+      '34': 'text-blue-600',
+      '35': 'text-purple-600',
+      '36': 'text-teal-600',
+      '37': 'text-gray-300',
+    };
+
+    for (const code in colorMap) {
+      const regex = new RegExp(`\\u001b\\[${code}m`, 'g');
+      text = text.replace(regex, `<span class="${colorMap[code]}">`);
+    }
+
+    text = text.replace(/\u001b\[0m/g, '</span>');
     text = text.replace(/\u001b\[1m/g, '<span class="font-bold">');
     text = text.replace(/\u001b\[22m/g, '</span>');
     text = text.replace(/\u001b\[4m/g, '<span class="underline">');

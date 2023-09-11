@@ -177,12 +177,10 @@ class Canvas {
 	}
 
 	set_mask() {
-		const backgroundImage = this.canvas.backgroundImage.getSrc();
-		this.canvas.getObjects().forEach((obj)=> {
-			this.canvas.remove(obj);
-		});
-
 		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + this.file_mask + '&cache=' + Math.random(), (img)=> {
+			this.canvas.getObjects().forEach((obj)=> {
+				this.canvas.remove(obj);
+			});
 			img.set({
 				left: 0,
 				top: 0,

@@ -45,4 +45,4 @@ class Image:
 			if re.match(r'^\d+\.png$', basename):
 				files_tmp.append(os.path.basename(filename))
 		
-		return sorted(files_tmp, key=lambda x: (int(x.split('.')[0])))
+		return sorted(files_tmp, key=lambda x: float(x.rsplit('.')[0]))
