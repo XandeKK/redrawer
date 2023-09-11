@@ -37,12 +37,12 @@ class Image:
 			elif os.path.isdir(full_path):
 				Image.transform_images_recursively(full_path)
 
-	def get_files(type):
+	def get_files():
 		files = glob.glob('unzip/*.png')
 		files_tmp = []
+
 		for filename in files:
 			files_tmp.append(os.path.basename(filename))
-		
-		files_tmp = sorted(files_tmp, key=lambda x: float(x.rsplit('.')[0]))
-		print(files_tmp)
+
+		files_tmp = sorted(files_tmp, key=lambda x: (float(x.split('.')[0]), float(x.split('.')[1].split('png')[0])))
 		return files_tmp
