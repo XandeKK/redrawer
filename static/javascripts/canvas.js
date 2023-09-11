@@ -158,8 +158,9 @@ class Canvas {
 
 	undo() {
 		if (this.canvas.getObjects().length === 0) return;
-		if (this.canvas.getObjects()[this.canvas.getObjects().length - 1].type === 'path') {
-			this.canvas.getObjects().pop();
+		const objects = this.canvas.getObjects();
+		if (objects[objects.length - 1].type === 'path') {
+			this.canvas.remove(objects[objects.length - 1]);
 			this.canvas.renderAll();
 		}
 	}
