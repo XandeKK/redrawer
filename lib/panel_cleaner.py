@@ -41,8 +41,6 @@ class Image:
 		files = glob.glob('unzip/*.png')
 		files_tmp = []
 		for filename in files:
-			basename = os.path.basename(filename)
-			if re.match(r'^\d+\.png$', basename):
-				files_tmp.append(os.path.basename(filename))
+			files_tmp.append(os.path.basename(filename))
 		
 		return sorted(files_tmp, key=lambda x: float(x.rsplit('.')[0]))
