@@ -20,7 +20,7 @@ class PanelCleaner:
 				socketio.emit('log', {'message': output})
 
 		Image.transform_images_recursively('panelcleaner')
-		socketio.emit('panel_cleaner', {'finished': True, 'files': Image.get_files('files')})
+		socketio.emit('panel_cleaner', {'finished': True, 'files': Image.get_files()})
 
 class Image:
 	def transform_image(path):
@@ -44,5 +44,15 @@ class Image:
 		for filename in files:
 			files_tmp.append(os.path.basename(filename))
 
-		files_tmp = sorted(files_tmp, key=lambda x: (float(x.split('.')[0]), float(x.split('.')[1].split('png')[0])))
+		def custom_sort_key(x):
+			parts = x.split('.')
+			numeric_part = parts[0]
+			try:
+				numeric_value = float(numeric_part)
+			except ValueError:
+				numeric_value = numeric_part
+			return (numeric_value, x)
+
+		files_tmp = sorted(files_tmp, key=custom_sort_key)
+
 		return files_tmp
