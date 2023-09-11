@@ -100,7 +100,7 @@ class Canvas {
 		this.can_move = false;
 		this.canvas.clear();
 		const file = this.files[this.index];
-		const file_mask = file.split('.').slice(0, -1).join('.') + '_mask.' + file.split('.').pop();
+		const file_mask = file.replace('.png', '_mask.png');
 		this.file_mask = file_mask;
 
 		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file + '&cache=' + this.cache_image, (img)=> {
