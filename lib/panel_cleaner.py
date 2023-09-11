@@ -43,4 +43,6 @@ class Image:
 		for filename in files:
 			files_tmp.append(os.path.basename(filename))
 		
-		return sorted(files_tmp, key=lambda x: float(x.rsplit('.')[0]))
+		files_tmp = sorted(files_tmp, key=lambda x: float(x.rsplit('.')[0]))
+		print(files_tmp)
+		return files_tmp
