@@ -19,7 +19,7 @@ class PanelCleaner:
 			if output != '':
 				socketio.emit('log', {'message': output})
 
-		Image.transform_images('panelcleaner')
+		Image.transform_images_recursively('panelcleaner')
 		socketio.emit('panel_cleaner', {'finished': True, 'files': Image.get_files()})
 
 class Image:
@@ -31,12 +31,14 @@ class Image:
 		path = path.replace('_mask', '')
 		cv2.imwrite(path, im)
 
-	def transform_images(path):
+	def transform_images_recursively(path):
 		for filename in os.listdir(path):
 			full_path = os.path.join(path, filename)
 
 			if os.path.isfile(full_path):
 				Image.transform_image(full_path)
+			elif os.path.isdir(full_path):
+				Image.transform_images_recursively(full_path)
 
 	def get_files():
 		files = glob.glob('unzip/*')
