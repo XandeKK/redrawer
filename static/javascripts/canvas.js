@@ -100,8 +100,9 @@ class Canvas {
 		this.can_move = false;
 		this.canvas.clear();
 		const file = this.files[this.index];
-		const file_mask = file;
-		this.file_mask = file_mask;
+		if (!file.endsWith('png')) {
+			this.file_mask = file.split('.')[0] + '.png'
+		}
 
 		fabric.Image.fromURL('file' + '?path=' + 'unzip/' + file + '&cache=' + this.cache_image, (img)=> {
 			this.cursor.setDimensions({
@@ -116,7 +117,7 @@ class Canvas {
 			this.canvas.renderAll();
 		});
 
-		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + file_mask + '&cache=' + Math.random(), (img)=> {
+		fabric.Image.fromURL('file' + '?path=' + 'panelcleaner/' + this.file_mask + '&cache=' + Math.random(), (img)=> {
 			img.set({
 				left: 0,
 				top: 0,
