@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request, url_for, send_from_directory, send_file
 from flask_socketio import SocketIO, emit
-from lib.waifu2x import Waifu2x
 from lib.panel_cleaner import PanelCleaner
 from lib.inpainting import Inpainting
 import os
@@ -44,10 +43,7 @@ def upload():
 	resize_images('unzip')
 	# If possible rename all files in order
 
-	if request.form.get('waifu2x', False) == 'true':
-		t = threading.Thread(target=Waifu2x.process_files, args=(socketio,))
-	else:
-		t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
+	t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
 
 	t.start()
 

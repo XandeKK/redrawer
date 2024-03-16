@@ -20,7 +20,7 @@
         </div>
         <div>
           <label for="pincel" class="block mb-2 text-sm font-medium text-gray-900">Pincel Size</label>
-          <input id="pincel" type="range" min="5" max="80" step="1" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
+          <input id="pincel" type="range" min="5" max="300" step="1" value="10" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer">
         </div>
         <div>
           <label for="color" class="block mb-2 text-sm font-medium text-gray-900">Pincel Color</label>
@@ -58,11 +58,6 @@
           </button>
         </div>
         <div>
-          <button id="redraw_one" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
-            Redraw One
-          </button>
-        </div>
-        <div>
           <button id="back" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-1">
             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
               <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
@@ -79,8 +74,6 @@
     <form id="form" action="/upload" method="post" enctype="multipart/form-data" class="flex gap-3 mb-2 items-center pt-16">
       <label class="text-sm font-medium text-gray-900" for="file_input">Upload Zip</label>
       <input class="w-96 text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer bg-gray-50 focus:outline-none" id="file" type="file">
-      <input id="waifu2x" type="checkbox" value="" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500focus:ring-2">
-      <label for="waifu2x" class="ml-2 text-sm font-medium text-gray-900 dark:text-gray-300">Waifu2x</label>
       <input type="submit" value="Send" class="text-white bg-gray-800 hover:bg-gray-900 focus:outline-none focus:ring-4 focus:ring-gray-300 font-medium rounded-lg text-sm px-5 py-0.5 cursor-pointer">
     </form>
     <div class="flex justify-center mb-4 relative pt-20">

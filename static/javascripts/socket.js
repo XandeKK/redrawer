@@ -33,20 +33,6 @@ class Socket {
 			  });
 		});
 
-		this.socket.on('inpainting_one_file', (data)=> {
-			fetch('file' + '?path=' + 'result/' + data.file)
-			  .then(response => response.blob())
-			  .then(blob => {
-			    const url = URL.createObjectURL(blob);
-			    const link = document.createElement('a');
-			    link.href = url;
-			    link.download = data.file.replace(/^.*\//, '');
-			    document.body.appendChild(link);
-			    link.click();
-			    document.body.removeChild(link);
-			  });
-		});
-
 		this.socket.on('panel_cleaner', (data)=> {
 			const files = data.files;
 			this.canvas.start(files);
@@ -57,7 +43,6 @@ class Socket {
 			const fileInput = document.querySelector('input[type="file"]');
 			const formData = new FormData();
 			formData.append('file', fileInput.files[0]);
-			formData.append('waifu2x', document.getElementById('waifu2x').checked);
 			fetch('/upload', {
 				method: 'POST',
 				body: formData
@@ -67,11 +52,6 @@ class Socket {
 		document.getElementById('redraw_all').addEventListener('click', evt=> {
 			if (this.canvas.files == null) return;
 			this.socket.emit('redraw_all');
-		});
-
-		document.getElementById('redraw_one').addEventListener('click', evt=> {
-			if (this.canvas.mask_url == null) return;
-			this.socket.emit('redraw_one', this.canvas.backgroundImage.src);
 		});
 	}
 }
