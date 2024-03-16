@@ -23,8 +23,9 @@ class Inpainting:
 		os.makedirs(directory)
 
 		path = os.path.abspath('unzip')
+		mask = os.path.abspath('panelcleaner')
 		self.socketio.emit('message', {'message': f'redraw {path}'})
-		process = subprocess.Popen(f'python /content/lama-cleaner/inpaint_cli.py --image_directory {path} --output_path {directory}'.split(), stdout=subprocess.PIPE)
+		process = subprocess.Popen(f'iopaint run --device cuda --image {path} --mask {mask} --output {directory}'.split(), stdout=subprocess.PIPE)
 		while True:
 			output = process.stdout.readline().decode()
 			if output == '' and process.poll() is not None:

@@ -39,10 +39,6 @@ def upload():
 		zip_ref.extractall('unzip')
 		socketio.emit('message', {'message': 'unzipped'})
 
-	change_extension_to_png('unzip')
-	resize_images('unzip')
-	# If possible rename all files in order
-
 	t = threading.Thread(target=PanelCleaner.process_files, args=(socketio,))
 
 	t.start()
@@ -79,29 +75,6 @@ def delete_folder_contents(folder_path):
 				shutil.rmtree(file_path)
 		except Exception as e:
 			print(f"Failed to delete {file_path}. Reason: {e}")
-
-def change_extension_to_png(directory):
-    for filename in glob.glob(os.path.join(directory, '*')):
-        if os.path.isdir(filename):
-            continue
-        base = os.path.splitext(filename)[0]
-        os.rename(filename, base + '.png')
-
-def resize_images(directory):
-    for filename in os.listdir(directory):
-        if filename.endswith('.png'):
-            img_path = os.path.join(directory, filename)
-            img = cv2.imread(img_path)
-            height, width = img.shape[:2]
-            if max(width, height) >= 8000:
-                half_height = height // 2
-                img1 = img[:half_height, :]
-                img2 = img[half_height:, :]
-                
-                cv2.imwrite(img_path.replace('.png', '.1.png'), img1)
-                cv2.imwrite(img_path.replace('.png', '.2.png'), img2)
-                
-                os.remove(img_path)
 
 inpaiting = Inpainting(socketio)
 
